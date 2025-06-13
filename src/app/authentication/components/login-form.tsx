@@ -1,6 +1,7 @@
 "use client"
 
 import {zodResolver} from "@hookform/resolvers/zod";
+import {Loader2} from "lucide-react";
 import {useRouter} from "next/navigation";
 import {useForm} from "react-hook-form";
 import { toast } from "sonner";
@@ -11,7 +12,6 @@ import {Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle} f
 import {Form, FormControl, FormField, FormItem, FormLabel, FormMessage} from "@/components/ui/form";
 import {Input} from "@/components/ui/input";
 import {authClient} from "@/lib/auth-client";
-import {Loader2} from "lucide-react";
 
 
 const loginSchema = z.object({
@@ -43,9 +43,6 @@ const LoginForm = () => {
                 },
                 onError: ()  => {
                     toast.error("E-mail ou Senha inválidos.");
-                },
-                onLoading: () => {
-                    toast.loading("Carregando...");
                 },
                 onIdle: () => {
                     toast.success("Login efetuado com sucesso.");
