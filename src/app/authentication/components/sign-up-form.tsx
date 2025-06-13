@@ -102,7 +102,7 @@ const SignUpForm = () => {
 
                     </CardContent>
                     <CardFooter>
-                        <Button type="submit" className='w-full' disabled={form.formState.isSubmitting}>
+                        <Button type="submit" className='w-full cursor-pointer' disabled={form.formState.isSubmitting}>
                             {form.formState.isSubmitting ? (
                                 <Loader2 className='w-4 h-4 mr-2 animate-spin' />
                                 ) : (
