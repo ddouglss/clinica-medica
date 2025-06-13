@@ -1,15 +1,9 @@
-"use client"
-
-import SignUpForm from "@/app/authentication/components/sign-up-form";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
-import { Tabs, TabsContent, TabsList, TabsTrigger, } from "@/components/ui/tabs";
 import LoginForm from "@/app/authentication/components/login-form";
+import SignUpForm from "@/app/authentication/components/sign-up-form";
+import { Tabs, TabsContent, TabsList, TabsTrigger, } from "@/components/ui/tabs";
 
 
 const AuthenticationPage = () => {
-
-
 
     return (
         <div className="flex h-screen w-screen items-center justify-center">
