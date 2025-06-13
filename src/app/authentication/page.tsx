@@ -4,6 +4,7 @@ import SignUpForm from "@/app/authentication/components/sign-up-form";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger, } from "@/components/ui/tabs";
+import LoginForm from "@/app/authentication/components/login-form";
 
 
 const AuthenticationPage = () => {
@@ -18,19 +19,7 @@ const AuthenticationPage = () => {
                     <TabsTrigger value="register" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">Register</TabsTrigger>
                 </TabsList>
                 <TabsContent value="login">
-                    <Card>
-                        <CardHeader>
-                            <CardTitle>Login</CardTitle>
-                            <CardDescription>
-                                Faça login para continuar
-                            </CardDescription>
-                        </CardHeader>
-                        <CardContent className="grid gap-6">
-                        </CardContent>
-                        <CardFooter>
-                            <Button>Entrar</Button>
-                        </CardFooter>
-                    </Card>
+                  <LoginForm/>
                 </TabsContent>
                 <TabsContent value="register">
                     <SignUpForm/>
