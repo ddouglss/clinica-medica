@@ -1,7 +1,10 @@
+import {eq} from "drizzle-orm";
 import {headers} from "next/headers";
 import {redirect} from "next/navigation";
 
 import SignOutButton from "@/app/dashboard/components/sign-out-button";
+import {db} from "@/db";
+import {usersToClincsTable} from "@/db/schema";
 import {auth} from "@/lib/auth";
 
 const DashboardPage = async () => {
@@ -11,6 +14,14 @@ const DashboardPage = async () => {
     if (!session?.user) {
         redirect("/authentication");
     }
+    // Preciso pegar as clínicas dos usuários logados
+    const clinics = await db.query.usersToClincsTable.findMany({
+        where: eq(usersToClincsTable.userId, session?.user?.id),
+    })
+    if(clinics.length === 0){
+        redirect("/clinic-form");
+    }
+
     return (
         <div>
             Dashboard
