@@ -44,9 +44,6 @@ const LoginForm = () => {
                 onError: ()  => {
                     toast.error("E-mail ou Senha inválidos.");
                 },
-                onIdle: () => {
-                    toast.success("Login efetuado com sucesso.");
-                },
             }
         )
     }

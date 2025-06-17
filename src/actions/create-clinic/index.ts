@@ -4,7 +4,7 @@ import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 
 import { db } from "@/db";
-import {clinicsTable, usersToClincsTable} from "@/db/schema";
+import {clinicsTable, usersToClinicsTable} from "@/db/schema";
 import { auth } from "@/lib/auth";
 
 export const createClinic = async (name: string) => {
@@ -15,9 +15,9 @@ export const createClinic = async (name: string) => {
         throw new Error("Unauthorized");
     }
     const [clinic] = await db.insert(clinicsTable).values({ name }).returning();
-    await db.insert(usersToClincsTable).values({
+    await db.insert(usersToClinicsTable).values({
         userId: session.user.id,
-        clientId: clinic.id,
+        clinicId: clinic.id,
     });
     redirect("/dashboard");
 };
