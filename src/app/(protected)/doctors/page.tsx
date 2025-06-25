@@ -1,4 +1,5 @@
 import {Plus} from "lucide-react";
+import {headers} from "next/headers";
 import {redirect} from "next/navigation";
 
 import {Button} from "@/components/ui/button";
@@ -13,7 +14,9 @@ import {
 import {auth} from "@/lib/auth";
 
 const DoctorsPage = async () => {
-  const session = await auth.api.getSession();
+  const session = await auth.api.getSession({
+    headers: await headers(),
+  });
   if (!session?.user){
     redirect("/authentication");
   }
