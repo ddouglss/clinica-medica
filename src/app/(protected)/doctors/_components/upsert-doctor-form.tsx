@@ -2,10 +2,13 @@
 
 
 import {zodResolver} from "@hookform/resolvers/zod";
+import {useAction} from "next-safe-action/hooks";
 import { useForm } from "react-hook-form";
 import { NumericFormat} from "react-number-format";
+import {toast} from "sonner";
 import {z} from "zod";
 
+import {upsertDoctor} from "@/actions/upsert-doctor";
 import {medicalSpecialties} from "@/app/(protected)/doctors/_constants";
 import {Button} from "@/components/ui/button";
 import {
@@ -42,8 +45,7 @@ const formSchema = z.object({
     availableToTime: z.string().min(1, {
         message: "Hora de téminar é obrigatório.",
     }),
-}).refine(
-    (data) => {
+}).refine((data) => {
         return data.availableFromTime < data.availableToTime;
     },
     {
@@ -53,7 +55,11 @@ const formSchema = z.object({
     },
 );
 
-const UpsertDoctorForm = () => {
+interface UpsertDoctorFormProps {
+    onSuccess?: () => void;
+}
+
+const UpsertDoctorForm = ({ onSuccess }: UpsertDoctorFormProps) => {
     const form = useForm<z.infer<typeof formSchema>>({
         resolver: zodResolver(formSchema),
         defaultValues: {
@@ -66,10 +72,28 @@ const UpsertDoctorForm = () => {
             availableToTime: "",
         },
     });
+    const upsertDoctorAction = useAction(upsertDoctor, {
+        onSuccess: () => {
+            toast.success("Médico adicionado com sucesso.");
+            onSuccess?.();
+        },
+        onError: () => {
+            toast.error("Erro ao adicionar médico. Tente novamente.");
+        },
+    });
 
     const onsubmit = (values: z.infer<typeof formSchema>) => {
-        console.log(values)
+        upsertDoctorAction.execute({
+            name: values.name,
+            specialty: values.specialty,
+            appointmentPriceInCents: values.appointmentPrice * 100,
+            availableFromWeekDay: parseInt(values.availableFromWeekDay),
+            availableToWeekDay: parseInt(values.availableToWeekDay),
+            availableFromTime: values.availableFromTime,
+            availableToTime: values.availableToTime,
+        });
     };
+
 
     return <DialogContent>
             <DialogHeader>
@@ -337,7 +361,9 @@ const UpsertDoctorForm = () => {
                         </FormItem>
                     )}
                 />
-                <Button type="submit" className="justify-end">Adicionar</Button>
+                <Button type="submit" className="justify-end" disabled={upsertDoctorAction.isPending}>
+                    {upsertDoctorAction.isExecuting ? "Adicionando..." : "Adicionar"}
+                </Button>
             </form>
         </Form>
     </DialogContent>
