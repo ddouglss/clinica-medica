@@ -1,43 +1,60 @@
 "use server";
 
-import { eq } from "drizzle-orm"; // importante para o `where`
 import { headers } from "next/headers";
+import { revalidatePath } from "next/cache";
 
 import { upsertDoctorSchema } from "@/actions/upsert-doctor/schema";
 import { db } from "@/db";
 import { doctorsTable } from "@/db/schema";
 import { auth } from "@/lib/auth";
 import { actionClient } from "@/lib/next-safe-action";
+import dayjs from "dayjs";
+import utc from "dayjs/plugin/utc";
+
+dayjs.extend(utc);
 
 export const upsertDoctor = actionClient
-    .schema(upsertDoctorSchema)
-    .action(async ({ parsedInput }) => {
-        const session = await auth.api.getSession({
-            headers: await headers(),
-        });
+  .schema(upsertDoctorSchema)
+  .action(async ({ parsedInput }) => {
+    const availableFromTime = parsedInput.availableFromTime; // 15:30:00
+    const availableToTime = parsedInput.availableToTime; // 16:00:00
 
-        if (!session?.user) {
-            throw new Error("Unauthorized");
-        }
+    const availableFromTimeUTC = dayjs()
+      .set("hour", parseInt(availableFromTime.split(":")[0]))
+      .set("minute", parseInt(availableFromTime.split(":")[1]))
+      .set("second", parseInt(availableFromTime.split(":")[2]))
+      .utc();
+    const availableToTimeUTC = dayjs()
+      .set("hour", parseInt(availableToTime.split(":")[0]))
+      .set("minute", parseInt(availableToTime.split(":")[1]))
+      .set("second", parseInt(availableToTime.split(":")[2]))
+      .utc();
 
-        if (!session.user.clinic?.id) {
-            throw new Error("Clinic not found");
-        }
-
-        // 🔐 Adiciona o clinicId ao dado a ser inserido
-        const doctorData = {
-            ...parsedInput,
-            clinicId: session.user.clinic.id,
-        };
-
-        if (parsedInput.id) {
-            // Atualização
-            await db
-                .update(doctorsTable)
-                .set(doctorData)
-                .where(eq(doctorsTable.id, parsedInput.id));
-        } else {
-            // Inserção
-            await db.insert(doctorsTable).values(doctorData);
-        }
+    const session = await auth.api.getSession({
+      headers: await headers(),
     });
+    if (!session?.user) {
+      throw new Error("Unauthorized");
+    }
+    if (!session?.user.clinic?.id) {
+      throw new Error("Clinic not found");
+    }
+    await db
+      .insert(doctorsTable)
+      .values({
+        ...parsedInput,
+        id: parsedInput.id,
+        clinicId: session?.user.clinic?.id,
+        availableFromTime: availableFromTimeUTC.format("HH:mm:ss"),
+        availableToTime: availableToTimeUTC.format("HH:mm:ss"),
+      })
+      .onConflictDoUpdate({
+        target: [doctorsTable.id],
+        set: {
+          ...parsedInput,
+          availableFromTime: availableFromTimeUTC.format("HH:mm:ss"),
+          availableToTime: availableToTimeUTC.format("HH:mm:ss"),
+        },
+      });
+    revalidatePath("/doctors");
+  });
