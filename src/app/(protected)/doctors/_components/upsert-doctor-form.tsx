@@ -26,6 +26,7 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import {Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue} from "@/components/ui/select";
+import { doctorsTable } from "@/db/schema";
 
 const formSchema = z.object({
     name: z.string().trim().min(1, {
@@ -56,34 +57,41 @@ const formSchema = z.object({
 );
 
 interface UpsertDoctorFormProps {
+    doctor?: typeof doctorsTable.$inferSelect;
     onSuccess?: () => void;
 }
 
-const UpsertDoctorForm = ({ onSuccess }: UpsertDoctorFormProps) => {
+const UpsertDoctorForm = ({ doctor, onSuccess }: UpsertDoctorFormProps) => {
     const form = useForm<z.infer<typeof formSchema>>({
         resolver: zodResolver(formSchema),
         defaultValues: {
-            name: "",
-            specialty: "",
-            appointmentPrice: 0 as number,
-            availableFromWeekDay: "0",
-            availableToWeekDay: "0",
-            availableFromTime: "",
-            availableToTime: "",
+            name: doctor?.name ?? "",
+            specialty: doctor?.specialty ?? "",
+            appointmentPrice: doctor?.appointmentPriceInCents ? doctor.appointmentPriceInCents /100 : 0,
+            availableFromWeekDay: doctor?.availableFromWeekDay?.toString() ?? "1",
+            availableToWeekDay: doctor?.availableToWeekDay?.toString () ?? "5",
+            availableFromTime: doctor?.availableFromTime ?? "",
+            availableToTime: doctor?.availableToTime ?? "",
         },
     });
     const upsertDoctorAction = useAction(upsertDoctor, {
         onSuccess: () => {
-            toast.success("Médico adicionado com sucesso.");
-            onSuccess?.();
+          toast.success(
+            doctor ? "Médico atualizado com sucesso." : "Médico adicionado com sucesso."
+          );
+          onSuccess?.();
         },
         onError: () => {
-            toast.error("Erro ao adicionar médico. Tente novamente.");
+          toast.error(
+            doctor ? "Erro ao atualizar médico. Tente novamente." : "Erro ao adicionar médico."
+          );
         },
-    });
+      });
+      
 
     const onsubmit = (values: z.infer<typeof formSchema>) => {
         upsertDoctorAction.execute({
+            id: doctor?.id,
             name: values.name,
             specialty: values.specialty,
             appointmentPriceInCents: values.appointmentPrice * 100,
@@ -97,11 +105,10 @@ const UpsertDoctorForm = ({ onSuccess }: UpsertDoctorFormProps) => {
 
     return <DialogContent>
             <DialogHeader>
-                <DialogTitle>
-                        Adicionar médico
+                <DialogTitle>{doctor ? doctor.name : "Adicionar médico"}
                 </DialogTitle>
                 <DialogDescription>
-                    Adicione um novo médico.
+                    {doctor ? "Edite as informações desse médico." : "Adicione um novo médico."}
                 </DialogDescription>
             </DialogHeader>
         <Form {...form}>
@@ -362,7 +369,11 @@ const UpsertDoctorForm = ({ onSuccess }: UpsertDoctorFormProps) => {
                     )}
                 />
                 <Button type="submit" className="justify-end" disabled={upsertDoctorAction.isPending}>
-                    {upsertDoctorAction.isExecuting ? "Adicionando..." : "Adicionar"}
+                    {upsertDoctorAction.isPending 
+                    ? "Salvando..."
+                    : doctor
+                    ? "Salvar"
+                    : "Adicionar"}
                 </Button>
             </form>
         </Form>
