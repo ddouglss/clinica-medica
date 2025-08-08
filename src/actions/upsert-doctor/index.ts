@@ -1,15 +1,16 @@
 "use server";
 
-import { headers } from "next/headers";
+import dayjs from "dayjs";
+import utc from "dayjs/plugin/utc";
 import { revalidatePath } from "next/cache";
+import { headers } from "next/headers";
 
-import { upsertDoctorSchema } from "@/actions/upsert-doctor/schema";
 import { db } from "@/db";
 import { doctorsTable } from "@/db/schema";
 import { auth } from "@/lib/auth";
 import { actionClient } from "@/lib/next-safe-action";
-import dayjs from "dayjs";
-import utc from "dayjs/plugin/utc";
+
+import { upsertDoctorSchema } from "./schema";
 
 dayjs.extend(utc);
 
