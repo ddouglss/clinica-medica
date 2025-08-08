@@ -163,6 +163,7 @@ export const patientsTableRelations = relations(
             references: [clinicsTable.id],
         }),
         appointments: many(appointmentsTable),
+        reports: many(patientReportsTable),
     }),
 );
 
@@ -198,6 +199,70 @@ export const appointmentsTableRelations = relations(
         doctor: one(doctorsTable, {
             fields: [appointmentsTable.doctorId],
             references: [doctorsTable.id],
+        }),
+    }),
+);
+
+// Patient reports and attachments
+export const patientReportAttachmentTypeEnum = pgEnum(
+    "patient_report_attachment_type",
+    ["attachment", "prescription"],
+);
+
+export const patientReportsTable = pgTable("patient_reports", {
+    id: uuid("id").defaultRandom().primaryKey(),
+    clinicId: uuid("clinic_id")
+        .notNull()
+        .references(() => clinicsTable.id, { onDelete: "cascade" }),
+    patientId: uuid("patient_id")
+        .notNull()
+        .references(() => patientsTable.id, { onDelete: "cascade" }),
+    title: text("title").notNull(),
+    details: text("details"),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+    updatedAt: timestamp("updated_at")
+        .defaultNow()
+        .$onUpdate(() => new Date()),
+});
+
+export const patientReportsTableRelations = relations(
+    patientReportsTable,
+    ({ one, many }) => ({
+        clinic: one(clinicsTable, {
+            fields: [patientReportsTable.clinicId],
+            references: [clinicsTable.id],
+        }),
+        patient: one(patientsTable, {
+            fields: [patientReportsTable.patientId],
+            references: [patientsTable.id],
+        }),
+        attachments: many(patientReportAttachmentsTable),
+    }),
+);
+
+export const patientReportAttachmentsTable = pgTable(
+    "patient_report_attachments",
+    {
+        id: uuid("id").defaultRandom().primaryKey(),
+        reportId: uuid("report_id")
+            .notNull()
+            .references(() => patientReportsTable.id, { onDelete: "cascade" }),
+        kind: patientReportAttachmentTypeEnum("kind").notNull(),
+        name: text("name").notNull(),
+        url: text("url"),
+        createdAt: timestamp("created_at").defaultNow().notNull(),
+        updatedAt: timestamp("updated_at")
+            .defaultNow()
+            .$onUpdate(() => new Date()),
+    },
+);
+
+export const patientReportAttachmentsTableRelations = relations(
+    patientReportAttachmentsTable,
+    ({ one }) => ({
+        report: one(patientReportsTable, {
+            fields: [patientReportAttachmentsTable.reportId],
+            references: [patientReportsTable.id],
         }),
     }),
 );
