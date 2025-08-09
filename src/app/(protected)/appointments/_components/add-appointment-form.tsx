@@ -6,7 +6,7 @@ import { useEffect, useMemo, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { NumericFormat } from 'react-number-format'
 import { toast } from 'sonner'
-import { z } from 'zod'
+import { date, z } from 'zod'
 
 import { Button } from '@/components/ui/button'
 import { Calendar } from '@/components/ui/calendar'
@@ -130,6 +130,19 @@ const AddAppointmentForm = ({ isOpen, doctors, patients, onSuccess }: AddAppoint
     })
   }
 
+  const isDateAvailable = (date: Date) => {
+    if (!selectedDoctorId) return false;
+    const selectedDoctor = doctors.find(
+      (doctor) => doctor.id === selectedDoctorId,
+    );
+    if (!selectedDoctor) return false;
+    const dayOfWeek = date.getDay();
+    return (
+      dayOfWeek >= selectedDoctor?.availableFromWeekDay &&
+      dayOfWeek <= selectedDoctor?.availableToWeekDay
+    );
+  };
+
   return (
     <DialogContent>
       <DialogHeader>
@@ -252,7 +265,10 @@ const AddAppointmentForm = ({ isOpen, doctors, patients, onSuccess }: AddAppoint
                         onSelect={(d) => field.onChange(d)}
                         locale={ptBR}
                         fromDate={startOfToday}
-                        disabled={{ before: startOfToday }}
+                        disabled={(date) =>
+                          date < new Date() || !isDateAvailable(date)
+                        }
+                        initialFocus
                       />
                     </PopoverContent>
                   </Popover>
