@@ -41,7 +41,7 @@ const formSchema = z.object({
     .string()
     .trim()
     .min(10, { message: 'Telefone é obrigatório.' }),
-  sex: z.enum(['male', 'female'], { required_error: 'Sexo é obrigatório.' }),
+  sex: z.enum(['masculino', 'feminino'], { required_error: 'Sexo é obrigatório.' }),
 })
 
 interface UpsertPatientFormProps {
@@ -64,7 +64,7 @@ const UpsertPatientForm = ({ patient, onSuccess, isOpen }: UpsertPatientFormProp
 
   useEffect(() => {
     if (isOpen) {
-      form.reset(patient);
+      form.reset(patient)
     }
   }, [isOpen, form, patient])
 
@@ -163,8 +163,8 @@ const UpsertPatientForm = ({ patient, onSuccess, isOpen }: UpsertPatientFormProp
                     </SelectTrigger>
                   </FormControl>
                   <SelectContent>
-                    <SelectItem value="male">Masculino</SelectItem>
-                    <SelectItem value="female">Feminino</SelectItem>
+                    <SelectItem value="masculino">Masculino</SelectItem>
+                    <SelectItem value="feminino">Feminino</SelectItem>
                   </SelectContent>
                 </Select>
                 <FormMessage />

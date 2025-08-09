@@ -14,7 +14,7 @@ export const upsertPatientSchema = z.object({
     .string()
     .trim()
     .min(10, { message: "Telefone é obrigatório." }),
-  sex: z.enum(["male", "female"], {
+  sex: z.enum(["masculino", "feminino"], {
     required_error: "Sexo é obrigatório.",
   }),
 });

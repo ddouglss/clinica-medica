@@ -92,7 +92,7 @@ const PatientReportDialog = ({ patientId, patientName, report }: PatientReportDi
     doc.text('Relatório do paciente', 14, yStart)
     doc.setFontSize(12)
     const lines = [
-      `Paciente: ${patientId}`,
+      `Paciente: ${patientName}`,
       `Título: ${form.getValues('title')}`,
       `Detalhes: ${form.getValues('details') || '-'}`,
     ]
@@ -101,7 +101,7 @@ const PatientReportDialog = ({ patientId, patientName, report }: PatientReportDi
       doc.text(line, 14, y)
       y += 8
     })
-    doc.save(`relatorio-${patientId}.pdf`)
+    doc.save(`relatorio-${patientName}.pdf`)
   }
 
   return (

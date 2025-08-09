@@ -57,18 +57,34 @@ const PatientCard = ({ patient }: PatientCardProps) => {
   return (
     <Card>
       <CardHeader>
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-1">
           <Avatar className="h-10 w-10">
             <AvatarFallback>{patientInitials}</AvatarFallback>
           </Avatar>
-          <div>
             <h3 className="text-sm font-medium">{patient.name}</h3>
-            <p className="text-muted-foreground text-sm">{patient.email}</p>
-            <p className="text-muted-foreground text-sm">{patient.phoneNumber}</p>
-            <p className="text-muted-foreground text-sm">{patient.sex}</p>
-          </div>
         </div>
       </CardHeader>
+      <Separator />
+      <CardContent>
+        <div className="flex flex-col gap-1">
+          <div>
+            <Badge variant="outline">
+              <p className="text-muted-foreground text-sm">{patient.email}</p>
+            </Badge>
+          </div>
+          <div>
+            <Badge variant="outline">
+              <p className="text-muted-foreground text-sm">{patient.phoneNumber}</p>
+            </Badge>
+          </div>
+
+          <div>
+            <Badge variant="outline">
+              <p className="text-muted-foreground text-sm">{patient.sex}</p>
+            </Badge>
+          </div>
+        </div>
+      </CardContent>
       <Separator />
       <CardContent className="flex flex-col gap-2">
         <Dialog>
@@ -88,10 +104,10 @@ const PatientCard = ({ patient }: PatientCardProps) => {
           <DialogTrigger asChild>
             <Button className="w-full">Ver detalhes</Button>
           </DialogTrigger>
-          <UpsertPatientForm 
-          patient={patient} 
-          onSuccess={() => setIsUpsertDialogOpen(false)}
-          isOpen={isUpsertDialogOpen} />
+          <UpsertPatientForm
+            patient={patient}
+            onSuccess={() => setIsUpsertDialogOpen(false)}
+            isOpen={isUpsertDialogOpen} />
         </Dialog>
 
         <AlertDialog>
