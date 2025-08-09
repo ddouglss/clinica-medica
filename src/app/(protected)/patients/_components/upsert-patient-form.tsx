@@ -45,7 +45,7 @@ const formSchema = z.object({
 })
 
 interface UpsertPatientFormProps {
-  isOpen: boolean;
+  isOpen?: boolean;
   patient?: typeof patientsTable.$inferSelect
   onSuccess?: () => void
 }
@@ -64,7 +64,12 @@ const UpsertPatientForm = ({ patient, onSuccess, isOpen }: UpsertPatientFormProp
 
   useEffect(() => {
     if (isOpen) {
-      form.reset(patient)
+      form.reset({
+        name: patient?.name ?? '',
+        email: patient?.email ?? '',
+        phoneNumber: patient?.phoneNumber ?? '',
+        sex: patient?.sex ?? undefined,
+      })
     }
   }, [isOpen, form, patient])
 
@@ -162,10 +167,10 @@ const UpsertPatientForm = ({ patient, onSuccess, isOpen }: UpsertPatientFormProp
                       <SelectValue placeholder="Selecione o sexo" />
                     </SelectTrigger>
                   </FormControl>
-                  <SelectContent>
-                    <SelectItem value="masculino">Masculino</SelectItem>
-                    <SelectItem value="feminino">Feminino</SelectItem>
-                  </SelectContent>
+                   <SelectContent>
+                   <SelectItem value="masculino">Masculino</SelectItem>
+                   <SelectItem value="feminino">Feminino</SelectItem>
+                 </SelectContent>
                 </Select>
                 <FormMessage />
               </FormItem>
