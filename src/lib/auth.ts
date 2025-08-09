@@ -1,3 +1,4 @@
+import "server-only";
 import { betterAuth } from "better-auth";
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
 import {customSession} from "better-auth/plugins";

@@ -12,10 +12,12 @@ import {
   PageTitle,
 } from "@/components/ui/page-container";
 import { db } from "@/db";
-import { doctorsTable, patientsTable } from "@/db/schema";
+import { appointmentsTable, doctorsTable, patientsTable } from "@/db/schema";
 import { auth } from "@/lib/auth";
 
 import AddAppointmentButton from "./_components/add-appointment-button";
+import { DataTable } from "@/components/ui/data-table";
+import { appointmentsTableColumns } from "./_components/table-columns";
 
 const AppointmentsPage = async () => {
   const session = await auth.api.getSession({
@@ -33,6 +35,11 @@ const AppointmentsPage = async () => {
     }),
   ]);
 
+  const appointments = await db.query.appointmentsTable.findMany({
+    where: eq(appointmentsTable.clinicId, session.user.clinic.id),
+    with: { doctor: true, patient: true },
+  });
+
   return (
     <PageContainer>
       <PageHeader>
@@ -45,8 +52,7 @@ const AppointmentsPage = async () => {
         </PageActions>
       </PageHeader>
       <PageContent>
-        <div className="hidden" />
-        Listagem em breve
+        <DataTable data={appointments} columns={appointmentsTableColumns} />
       </PageContent>
     </PageContainer>
   );

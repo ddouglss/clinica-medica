@@ -101,7 +101,6 @@ const PatientsTableActions = ({ patient }: PatientsTableActionsProps) => {
 
       <Dialog open={reportDialogIsOpen} onOpenChange={setReportDialogIsOpen}>
         <DialogTrigger asChild>
-          {/* Hidden trigger, open via state */}
           <button className="hidden" />
         </DialogTrigger>
         <PatientReportDialog

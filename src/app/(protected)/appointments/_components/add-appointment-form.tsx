@@ -16,21 +16,31 @@ import { Input } from '@/components/ui/input'
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
 import { Select, SelectContent, SelectGroup, SelectLabel,  SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { appointmentsTable, doctorsTable, patientsTable } from '@/db/schema'
-import { upsertAppointment } from '@/actions/upsert-appointment'
+import { addAppointment } from '@/actions/add-appointment'
 import { CalendarIcon } from 'lucide-react'
 import { ptBR } from 'date-fns/locale/pt-BR'
+
+const startOfToday = (() => {
+  const d = new Date()
+  d.setHours(0, 0, 0, 0)
+  return d
+})()
 
 const formSchema = z.object({
   patientId: z.string().min(1,{ message: 'Paciente é obrigatório.' }),
   doctorId: z.string().min(1,{ message: 'Médico é obrigatório.' }),
   appointmentPrice: z.number().min(0.01, { message: 'Valor da consulta é obrigatória.'}),
-  date: z.date({ message: 'Data é obrigatória.' }),
+  date: z.date({ message: 'Data é obrigatória.' }).refine((d) => {
+    const picked = new Date(d)
+    picked.setHours(0, 0, 0, 0)
+    return picked.getTime() >= startOfToday.getTime()
+  }, { message: 'Selecione uma data a partir de hoje.' }),
   time: z.string().min(1,{
     message: 'Horário é obrigatório'
   }),
 })
 
-interface UpsertAppointmentFormProps {
+interface AddAppointmentFormProps {
   isOpen: boolean
   doctors: Array<typeof doctorsTable.$inferSelect>
   patients: Array<typeof patientsTable.$inferSelect>
@@ -38,7 +48,7 @@ interface UpsertAppointmentFormProps {
   onSuccess?: () => void
 }
 
-const UpsertAppointmentForm = ({ isOpen, doctors, patients, onSuccess }: UpsertAppointmentFormProps) => {
+const AddAppointmentForm = ({ isOpen, doctors, patients, onSuccess }: AddAppointmentFormProps) => {
   const [selectedDoctorId, setSelectedDoctorId] = useState<string | undefined>(undefined)
   const [selectedPatientId, setSelectedPatientId] = useState<string | undefined>(undefined)
 
@@ -76,7 +86,7 @@ const UpsertAppointmentForm = ({ isOpen, doctors, patients, onSuccess }: UpsertA
     }
   }, [selectedDoctor, form])
 
-  const upsertAppointmentAction = useAction(upsertAppointment, {
+  const createAppointmentAction = useAction(addAppointment, {
     onSuccess: () => {
       toast.success('Agendamento criado com sucesso.')
       onSuccess?.()
@@ -87,7 +97,7 @@ const UpsertAppointmentForm = ({ isOpen, doctors, patients, onSuccess }: UpsertA
   })
 
   const onSubmit = (values: z.infer<typeof formSchema>) => {
-    upsertAppointmentAction.execute({
+    createAppointmentAction.execute({
       patientId: values.patientId,
       doctorId: values.doctorId,
       appointmentPriceInCents: values.appointmentPrice ? Math.round(values.appointmentPrice * 100) : undefined,
@@ -217,6 +227,8 @@ const UpsertAppointmentForm = ({ isOpen, doctors, patients, onSuccess }: UpsertA
                         selected={dataSelecionada}
                         onSelect={(d) => field.onChange(d)}
                         locale={ptBR}
+                        fromDate={startOfToday}
+                        disabled={{ before: startOfToday }}
                       />
                     </PopoverContent>
                   </Popover>
@@ -295,8 +307,8 @@ const UpsertAppointmentForm = ({ isOpen, doctors, patients, onSuccess }: UpsertA
           />
 
           <div className="flex justify-end gap-2 pt-2">
-            <Button type="submit" disabled={upsertAppointmentAction.isExecuting}>
-              {upsertAppointmentAction.isExecuting ? 'Salvando...' : 'Salvar'}
+            <Button type="submit" disabled={createAppointmentAction.isExecuting}>
+              {createAppointmentAction.isExecuting ? 'Salvando...' : 'Salvar'}
             </Button>
           </div>
         </form>
@@ -305,6 +317,4 @@ const UpsertAppointmentForm = ({ isOpen, doctors, patients, onSuccess }: UpsertA
   )
 }
 
-export default UpsertAppointmentForm
-
-
+export default AddAppointmentForm;

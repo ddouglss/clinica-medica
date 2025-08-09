@@ -7,7 +7,7 @@ import { useState } from 'react'
 import { Button } from '@/components/ui/button'
 import { Dialog, DialogTrigger } from '@/components/ui/dialog'
 import { doctorsTable, patientsTable } from '@/db/schema'
-import UpsertAppointmentForm from './upsert-appointment-form'
+import AppAppointmentForm from './add-appointment-form'
 
 interface AddAppointmentButtonProps {
   doctors: Array<typeof doctorsTable.$inferSelect>
@@ -24,7 +24,7 @@ const AddAppointmentButton = ({ doctors, patients }: AddAppointmentButtonProps) 
           Novo agendamento
         </Button>
       </DialogTrigger>
-      <UpsertAppointmentForm
+      <AppAppointmentForm
         isOpen={isOpen}
         doctors={doctors}
         patients={patients}
