@@ -124,7 +124,7 @@ const AddAppointmentForm = ({ isOpen, doctors, patients, onSuccess }: AddAppoint
     createAppointmentAction.execute({
       patientId: values.patientId,
       doctorId: values.doctorId,
-      appointmentPriceInCents: values.appointmentPrice ? Math.round(values.appointmentPrice * 100) : undefined,
+      appointmentPriceInCents: Math.round((values.appointmentPrice || 0) * 100),
       date: values.date,
       time: values.time,
     })
