@@ -56,16 +56,12 @@ export default function TopSpecialties({
             <Hospital className="text-muted-foreground" />
             <CardTitle className="text-base">Especialidades</CardTitle>
           </div>
-          <a href="/specialties" className="text-sm text-blue-600 hover:underline">
-            Ver todos
-          </a>
         </div>
 
-        {/* specialtys List */}
         <div className="space-y-6">
           {topSpecialties.map((specialty) => {
             const Icon = getSpecialtyIcon(specialty.specialty);
-            // Porcentagem de ocupação da especialidade baseando-se no maior número de agendamentos
+    
             const progressValue =
               (specialty.appointments / maxAppointments) * 100;
 
